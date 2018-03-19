@@ -1,8 +1,8 @@
 #!/bin/bash
-#Script auto create trial user SSH
-#yg akan expired setelah 1 hari
+# Script auto create trial user SSH
+# akan expired setelah 1 hari
 
-Login=trial-`</dev/urandom tr -dc X-Z0-9 | head -c4`
+Login=xlon-`</dev/urandom tr -dc X-Z0-9 | head -c4`
 masaaktif="1"
 Pass=`</dev/urandom tr -dc a-f0-9 | head -c9`
 IP=`dig +short myip.opendns.com @resolver1.opendns.com`
