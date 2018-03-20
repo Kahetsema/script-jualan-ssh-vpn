@@ -1,0 +1,22 @@
+#!/bin/bash
+# All Menus
+
+echo -e "=========================AVAILABLE COMMANDS=============================="
+echo -e "* menu         : display all available commands"
+echo -e "* usernew      : create new SSH account"
+echo -e "* usertrial    : create trial SSH account"
+echo -e "* userdelete   : delete SSH account"
+echo -e "* userlogin    : display all user online"
+echo -e "* userlist     : display all user list"
+echo -e "* userlimit <> : set <limit> to kill user who multi login"
+echo -e "* renew        : renew expired user"
+echo -e "* restart      : restart service (webmin, squid3, openvpn, openssh, vnstat, mrtg, dropbear)"
+echo -e "* reboot       : reboot VPS"
+echo -e "* bench        : run server benchmark info"
+echo -e "* scanvirus    : run virus scanning"
+echo -e "* mem          : run server memory check"
+echo -e "* speedtest    : run speedtest on VPS"
+echo -e "* exit         : logout & exit from SSH client"
+echo -e "========================================================================="
+echo -e "Kahetsema Netwok Solutions © 2018"
+echo -e ""
