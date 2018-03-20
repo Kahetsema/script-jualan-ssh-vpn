@@ -19,13 +19,13 @@ read -p "Maks login user (contoh 1 atau 2): " llimit
 echo "Proses instalasi script dimulai....."
 
 # Banner SSH
-echo "## SELAMAT DATANG DI SERVER PREMIUM $hnbaru ## " >> /etc/pesan
-echo "DENGAN MENGGUNAKAN LAYANAN SSH DARI SERVER INI BERARTI ANDA SETUJU SEGALA KETENTUAN YANG TELAH KAMI BUAT: " >> /etc/pesan
-echo "1. Tidak diperbolehkan untuk melakukan aktivitas illegal seperti DDoS, Hacking, Phising, Spam, dan Torrent di server ini; " >> /etc/pesan
-echo "2. Maks login $llimit kali, jika lebih dari itu maka akun otomatis ditendang oleh server; " >> /etc/pesan
-echo "3. Pengguna setuju jika kami mengetahui atau sistem mendeteksi pelanggaran di akunnya maka akun akan dihapus oleh sistem; " >> /etc/pesan
-echo "4. Tidak ada tolerasi bagi pengguna yang melakukan pelanggaran; " >> /etc/pesan
-echo "Server by $namap ( $nhp )" >> /etc/pesan
+echo "## SELAMAT DATANG DI SERVER $hnbaru ## " >> /etc/pesan
+echo "DENGAN MENGGUNAKAN LAYANAN SSH DARI SERVER INI BERARTI ANDA DIANGGAP TELAH MENYETUJUI SEGALA KETENTUAN YANG BERLAKU: " >> /etc/pesan
+echo "⚫ Dilarang melakukan segala macam aktivitas illegal termasuk dan tidak terbatas pada  DDoS, Hacking, Phising, Spam, dan Torrent di server ini; " >> /etc/pesan
+echo "⚫ Maksimal login $llimit kali, jika melebihi dari itu maka akun anda otomatis di-kick oleh sistem; " >> /etc/pesan
+echo "⚫ Pengguna menyetujui bila sistem mendeteksi adanya pelanggaran pada akun anda, maka akun tersebut akan dikenakan penalty oleh sistem; " >> /etc/pesan
+echo "⚫ Kami tidak memberi tolerasi atas pelanggaran yang dilakukan oleh user, hal ini demi kenyamanan user lainnya; " >> /etc/pesan
+echo "Server Managed by $namap ( $nhp )" >> /etc/pesan
 
 echo "Banner /etc/pesan" >> /etc/ssh/sshd_config
 
@@ -97,7 +97,7 @@ chkconfig nginx on
 chkconfig php-fpm on
 
 # install essential package
-yum -y install rrdtool screen iftop htop nmap bc nethogs openvpn vnstat ngrep mtr git zsh mrtg unrar rsyslog rkhunter mrtg net-snmp net-snmp-utils expect nano bind-utils
+yum -y install whois rrdtool screen iftop htop nmap bc nethogs openvpn vnstat ngrep mtr git zsh mrtg unrar rsyslog rkhunter mrtg net-snmp net-snmp-utils expect nano bind-utils
 yum -y groupinstall 'Development Tools'
 yum -y install cmake
 yum -y --enablerepo=rpmforge install axel sslh ptunnel unrar
@@ -123,13 +123,13 @@ echo "screenfetch" >> .bash_profile
 
 # install webserver
 cd
-wget -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/nginx.conf"
+wget -O /etc/nginx/nginx.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/nginx.conf"
 sed -i 's/www-data/nginx/g' /etc/nginx/nginx.conf
 mkdir -p /home/vps/public_html
-echo "<pre>Setup by Khairil G</pre>" > /home/vps/public_html/index.html
+echo "<pre><b>It works!</b></pre>" > /home/vps/public_html/index.html
 echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
 rm /etc/nginx/conf.d/*
-wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/vps.conf"
+wget -O /etc/nginx/conf.d/vps.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/vps.conf"
 sed -i 's/apache/nginx/g' /etc/php-fpm.d/www.conf
 chmod -R +rx /home/vps
 service php-fpm restart
@@ -163,9 +163,9 @@ wget -O /etc/openvpn/client.ovpn "https://raw.githubusercontent.com/khairilg/scr
 sed -i $MYIP2 /etc/openvpn/client.ovpn;
 #PASS=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1`;
 useradd -g 0 -d /root/ -s /bin/bash $dname
-echo $dname:$dname"@2017" | chpasswd
+echo $dname:$dname"@2018" | chpasswd
 echo $dname > pass.txt
-echo $dname"@2017" >> pass.txt
+echo $dname"@2018" >> pass.txt
 tar cf client.tar client.ovpn pass.txt
 cp client.tar /home/vps/public_html/
 cp client.ovpn /home/vps/public_html/
@@ -202,14 +202,14 @@ LANG=C /usr/bin/mrtg /etc/mrtg/mrtg.cfg
 
 # setting port ssh
 cd
-sed -i '/Port 22/a Port 143' /etc/ssh/sshd_config
-sed -i 's/#Port 22/Port  22/g' /etc/ssh/sshd_config
+sed -i '/Port 22/a Port 212' /etc/ssh/sshd_config
+sed -i 's/#Port 22/Port  444/g' /etc/ssh/sshd_config
 service sshd restart
 chkconfig sshd on
 
 # install dropbear
 yum -y install dropbear
-echo "OPTIONS=\"-p 80 -p 109 -p 110 -p 443 -b /etc/pesan\"" > /etc/sysconfig/dropbear
+echo "OPTIONS=\"-p 143 -p 3128 -b /etc/pesan\"" > /etc/sysconfig/dropbear
 echo "/bin/false" >> /etc/shells
 echo "PIDFILE=/var/run/dropbear.pid" >> /etc/init.d/dropbear
 service dropbear restart
@@ -267,17 +267,19 @@ chmod +x /usr/bin/bmon
 
 # downlaod script
 cd /usr/bin
-wget -O speedtest "https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py"
-wget -O bench "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/bench-network.sh"
-wget -O mem "https://raw.githubusercontent.com/pixelb/ps_mem/master/ps_mem.py"
-wget -O userlogin "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/user-login.sh"
-wget -O userexpire "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/autoexpire.sh"
-wget -O usernew "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/create-user.sh"
-wget -O userdelete "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/user-delete.sh"
+wget -0 menu "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/menu-list.sh"
+wget -O speedtest "https://raw.github.com/sivel/speedtest-cli/master/speedtest.py"
+wget -O bench "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/bench-network.sh"
+wget -O mem "https://raw.github.com/pixelb/ps_mem/master/ps_mem.py"
+wget -O userlogin "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-login.sh"
+wget -O userexpire "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/autoexpire.sh"
+wget -O usernew "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/create-user.sh"
+wget -O userdelete "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-delete.sh"
 wget -O userlimit "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/user-limit.sh"
-wget -O renew "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/user-renew.sh"
-wget -O userlist "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/user-list.sh" 
-wget -O trial "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/user-trial.sh"
+wget -O renew "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-renew.sh"
+wget -O userlist "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-list.sh" 
+wget -O usertrial "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-trial.sh"
+wget -0 restart "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/restart.sh"
 echo "cat /root/log-install.txt" | tee info
 echo "speedtest --share" | tee speedtest
 wget -O /root/chkrootkit.tar.gz ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz
@@ -289,6 +291,7 @@ wget -O checkvirus "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master
 wget -O cron-dropcheck "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/cron-dropcheck.sh"
 
 # sett permission
+chmod +x menu
 chmod +x userlogin
 chmod +x userdelete
 chmod +x userexpire
@@ -296,8 +299,9 @@ chmod +x usernew
 chmod +x userlist
 chmod +x userlimit
 chmod +x renew
-chmod +x trial
-chmod +x info
+chmod +x usertrial
+chmod +x restart
+#chmod +x info
 chmod +x speedtest
 chmod +x bench
 chmod +x mem
@@ -340,13 +344,13 @@ echo "Layanan yang diaktifkan"  | tee -a log-install.txt
 echo "--------------------------------------"  | tee -a log-install.txt
 echo "OpenVPN : TCP 1194 (client config : http://$MYIP:81/client.ovpn)"  | tee -a log-install.txt
 echo "Port OpenSSH : 22, 143"  | tee -a log-install.txt
-echo "Port Dropbear : 80, 109, 110, 443"  | tee -a log-install.txt
-echo "SquidProxy    : 8080, 8888, 3128 (limit to IP SSH)"  | tee -a log-install.txt
-echo "Nginx : 81"  | tee -a log-install.txt
+echo "Port Dropbear : 143, 3128"  | tee -a log-install.txt
+echo "SquidProxy    : 8080 (limit to IP SSH)"  | tee -a log-install.txt
+echo "Nginx : 80"  | tee -a log-install.txt
 echo "badvpn   : badvpn-udpgw port 7300"  | tee -a log-install.txt
 echo "Webmin   : http://$MYIP:10000/"  | tee -a log-install.txt
-echo "vnstat   : http://$MYIP:81/vnstat/"  | tee -a log-install.txt
-echo "MRTG     : http://$MYIP:81/mrtg/"  | tee -a log-install.txt
+echo "vnstat   : http://$MYIP/vnstat/"  | tee -a log-install.txt
+echo "MRTG     : http://$MYIP/mrtg/"  | tee -a log-install.txt
 echo "Timezone : Asia/Jakarta"  | tee -a log-install.txt
 echo "Fail2Ban : [on]"  | tee -a log-install.txt
 echo "IPv6     : [off]"  | tee -a log-install.txt
@@ -359,7 +363,7 @@ echo "" | tee -a log-install.txt
 echo "Account Default (untuk SSH dan VPN)"  | tee -a log-install.txt
 echo "---------------"  | tee -a log-install.txt
 echo "User     : $dname"  | tee -a log-install.txt
-echo "Password : $dname@2017"  | tee -a log-install.txt
+echo "Password : $dname@2018"  | tee -a log-install.txt
 echo "sudo su telah diaktifkan pada user $dname"  | tee -a log-install.txt
 echo "" | tee -a log-install.txt
 echo "Script Command"  | tee -a log-install.txt
@@ -375,7 +379,7 @@ echo "userlogin  : untuk melihat user yang sedang login"  | tee -a log-install.t
 echo "userdelete  : untuk menghapus user"  | tee -a log-install.txt
 echo "trial : untuk membuat akun trial selama 1 hari"  | tee -a log-install.txt
 echo "renew : untuk memperpanjang masa aktif akun"  | tee -a log-install.txt
-echo "info : untuk melihat ulang informasi ini"  | tee -a log-install.txt
+echo "menu : untuk melihat daftar command"  | tee -a log-install.txt
 echo "--------------"  | tee -a log-install.txt
 echo "CATATAN: Karena alasan keamanan untuk login ke user root silahkan gunakan port 443" | tee -a log-install.txt
 rm -f /root/centos-kvm.sh
