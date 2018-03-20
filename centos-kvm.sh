@@ -235,7 +235,7 @@ chkconfig fail2ban on
 
 # install squid
 yum -y install squid
-wget -O /etc/squid/squid.conf "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/squid-centos.conf"
+wget -O /etc/squid/squid.conf "https://raw.githubu.com/kahetsema/script-jualan-ssh-vpn/master/conf/squid-centos.conf"
 sed -i $MYIP2 /etc/squid/squid.conf;
 service squid restart
 chkconfig squid on
@@ -252,9 +252,9 @@ chkconfig webmin on
 
 # pasang bmon
 if [ "$OS" == "x86_64" ]; then
-  wget -O /usr/bin/bmon "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/bmon64"
+  wget -O /usr/bin/bmon "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/conf/bmon64"
 else
-  wget -O /usr/bin/bmon "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/bmon"
+  wget -O /usr/bin/bmon "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/conf/bmon"
 fi
 chmod +x /usr/bin/bmon
 
@@ -273,10 +273,10 @@ wget -O bench "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/benc
 wget -O mem "https://raw.github.com/pixelb/ps_mem/master/ps_mem.py"
 wget -O userlogin "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-login.sh"
 wget -O userexpire "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/autoexpire.sh"
-wget -O usernew "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/create-user.sh"
+wget -O usernew "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/create-user.sh"
 wget -O userdelete "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-delete.sh"
 wget -O userlimit "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/user-limit.sh"
-wget -O renew "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-renew.sh"
+wget -O renew "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-renew.sh"
 wget -O userlist "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-list.sh" 
 wget -O usertrial "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-trial.sh"
 wget -0 restart "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/restart.sh"
@@ -343,7 +343,7 @@ chkconfig crond on
 echo "Layanan yang diaktifkan"  | tee -a log-install.txt
 echo "--------------------------------------"  | tee -a log-install.txt
 echo "OpenVPN : TCP 1194 (client config : http://$MYIP:81/client.ovpn)"  | tee -a log-install.txt
-echo "Port OpenSSH : 22, 143"  | tee -a log-install.txt
+echo "Port OpenSSH : 212, 444"  | tee -a log-install.txt
 echo "Port Dropbear : 143, 3128"  | tee -a log-install.txt
 echo "SquidProxy    : 8080 (limit to IP SSH)"  | tee -a log-install.txt
 echo "Nginx : 80"  | tee -a log-install.txt
@@ -377,7 +377,7 @@ echo "userlist : untuk melihat daftar akun beserta masa aktifnya"  | tee -a log-
 echo "userlimit <limit> : untuk kill akun yang login lebih dari <limit>. Cth: userlimit 1"  | tee -a log-install.txt
 echo "userlogin  : untuk melihat user yang sedang login"  | tee -a log-install.txt
 echo "userdelete  : untuk menghapus user"  | tee -a log-install.txt
-echo "trial : untuk membuat akun trial selama 1 hari"  | tee -a log-install.txt
+echo "usertrial : untuk membuat akun trial selama 1 hari"  | tee -a log-install.txt
 echo "renew : untuk memperpanjang masa aktif akun"  | tee -a log-install.txt
 echo "menu : untuk melihat daftar command"  | tee -a log-install.txt
 echo "--------------"  | tee -a log-install.txt
