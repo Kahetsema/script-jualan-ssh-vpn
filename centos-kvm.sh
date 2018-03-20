@@ -2,7 +2,6 @@
 # Script Auto Installer by Indoworx
 # www.indoworx.com
 # initialisasi var
-OS=`uname -p`;
 
 # data pemilik server
 read -p "Nama pemilik server: " namap
@@ -135,41 +134,6 @@ chmod -R +rx /home/vps
 service php-fpm restart
 service nginx restart
 
-# install openvpn
-wget -O /etc/openvpn/openvpn.zip "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/conf/openvpn-key.zip"
-cd /etc/openvpn/
-unzip openvpn.tar
-wget -O /etc/openvpn/1194.conf "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/1194-centos.conf"
-if [ "$OS" == "x86_64" ]; then
-  wget -O /etc/openvpn/1194.conf "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/1194-centos64.conf"
-fi
-wget -O /etc/iptables.up.rules "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/iptables.up.rules"
-sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
-sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.d/rc.local
-MYIP=`curl icanhazip.com`;
-MYIP2="s/xxxxxxxxx/$MYIP/g";
-sed -i $MYIP2 /etc/iptables.up.rules;
-sed -i 's/venet0/eth0/g' /etc/iptables.up.rules
-iptables-restore < /etc/iptables.up.rules
-sysctl -w net.ipv4.ip_forward=1
-sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf
-service openvpn restart
-chkconfig openvpn on
-cd
-
-# configure openvpn client config
-cd /etc/openvpn/
-wget -O /etc/openvpn/client.ovpn "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/openvpn.conf"
-sed -i $MYIP2 /etc/openvpn/client.ovpn;
-#PASS=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1`;
-useradd -g 0 -d /root/ -s /bin/bash $dname
-echo $dname:$dname"@2018" | chpasswd
-echo $dname > pass.txt
-echo $dname"@2018" >> pass.txt
-tar cf client.tar client.ovpn pass.txt
-cp client.tar /home/vps/public_html/
-cp client.ovpn /home/vps/public_html/
-
 # install badvpn
 cd
 wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/conf/badvpn-udpgw"
@@ -233,9 +197,33 @@ yum -y install fail2ban
 service fail2ban restart
 chkconfig fail2ban on
 
+# Instal DDOS Flate
+if [ -d '/usr/local/ddos' ]; then
+	echo; echo; echo "Please un-install the previous version first"	exit 0else	mkdir /usr/local/ddos
+fi
+clear
+echo; echo 'Installing DOS-Deflate 0.6'; echo
+echo; echo -n 'Downloading source files...'
+wget -q -O /usr/local/ddos/ddos.conf http://www.inetbase.com/scripts/ddos/ddos.conf
+echo -n '.'
+wget -q -O /usr/local/ddos/LICENSE http://www.inetbase.com/scripts/ddos/LICENSE
+echo -n '.'
+wget -q -O /usr/local/ddos/ignore.ip.list http://www.inetbase.com/scripts/ddos/ignore.ip.list
+echo -n '.'
+wget -q -O /usr/local/ddos/ddos.sh http://www.inetbase.com/scripts/ddos/ddos.sh
+chmod 0755 /usr/local/ddos/ddos.sh
+cp -s /usr/local/ddos/ddos.sh /usr/local/sbin/ddos
+echo '...done'
+echo; echo -n 'Creating cron to run script every minute.....(Default setting)'
+/usr/local/ddos/ddos.sh --cron > /dev/null 2>&1
+echo '.....done'
+echo; echo 'Installation has completed.'
+echo 'Config file is at /usr/local/ddos/ddos.conf'
+echo 'Please send in your comments and/or suggestions to zaf@vsnl.com'
+
 # install squid
 yum -y install squid
-wget -O /etc/squid/squid.conf "https://raw.githubu.com/kahetsema/script-jualan-ssh-vpn/master/conf/squid-centos.conf"
+wget -O /etc/squid/squid.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/squid-centos.conf"
 sed -i $MYIP2 /etc/squid/squid.conf;
 service squid restart
 chkconfig squid on
@@ -258,26 +246,26 @@ else
 fi
 chmod +x /usr/bin/bmon
 
-# auto kill multi login
-#echo "while :" >> /usr/bin/autokill
-#echo "  do" >> /usr/bin/autokill
-#echo "  userlimit $llimit" >> /usr/bin/autokill
-#echo "  sleep 20" >> /usr/bin/autokill
-#echo "  done" >> /usr/bin/autokill
+# --- auto kill multi login
+# echo "while :" >> /usr/bin/autokill
+# echo "  do" >> /usr/bin/autokill
+# echo "  userlimit $llimit" >> /usr/bin/autokill
+# echo "  sleep 20" >> /usr/bin/autokill
+# echo "  done" >> /usr/bin/autokill
 
 # downlaod script
 cd /usr/bin
 wget -0 menu "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/menu-list.sh"
 wget -O speedtest "https://raw.github.com/sivel/speedtest-cli/master/speedtest.py"
-wget -O bench "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/bench-network.sh"
+wget -O bench "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/bench-network.sh"
 wget -O mem "https://raw.github.com/pixelb/ps_mem/master/ps_mem.py"
-wget -O userlogin "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-login.sh"
-wget -O userexpire "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/autoexpire.sh"
+wget -O userlogin "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-login.sh"
+wget -O userexpire "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/autoexpire.sh"
 wget -O usernew "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/create-user.sh"
-wget -O userdelete "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-delete.sh"
-wget -O userlimit "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/user-limit.sh"
+wget -O userdelete "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-delete.sh"
+wget -O userlimit "https://github.com/kahetsema/script-jualan-ssh-vpn/raw/master/user-limit.sh"
 wget -O renew "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-renew.sh"
-wget -O userlist "https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/user-list.sh" 
+wget -O userlist "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-list.sh" 
 wget -O usertrial "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-trial.sh"
 wget -0 restart "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/restart.sh"
 echo "cat /root/log-install.txt" | tee info
@@ -286,9 +274,9 @@ wget -O /root/chkrootkit.tar.gz ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.
 tar zxf /root/chkrootkit.tar.gz -C /root/
 rm -f /root/chkrootkit.tar.gz
 mv /root/chk* /root/chkrootkit
-wget -O checkvirus "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/checkvirus.sh"
+wget -O checkvirus "https://raw.github.com/kahetsema/script-jualan-ssh-vpn//master/checkvirus.sh"
 #wget -O cron-autokill "https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/cron-autokill.sh"
-wget -O cron-dropcheck "https://github.com/khairilg/script-jualan-ssh-vpn/raw/master/cron-dropcheck.sh"
+wget -O cron-dropcheck "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/cron-dropcheck.sh"
 
 # sett permission
 chmod +x menu
@@ -342,19 +330,20 @@ chkconfig crond on
 # info
 echo "Layanan yang diaktifkan"  | tee -a log-install.txt
 echo "--------------------------------------"  | tee -a log-install.txt
-echo "OpenVPN : TCP 1194 (client config : http://$MYIP:81/client.ovpn)"  | tee -a log-install.txt
-echo "Port OpenSSH : 212, 444"  | tee -a log-install.txt
+echo "OpenVPN    : [off] {TCP 1194 (client config : http://$MYIP/client.ovpn)}"  | tee -a log-install.txt
+echo "Port OpenSSH  : 212, 444"  | tee -a log-install.txt
 echo "Port Dropbear : 143, 3128"  | tee -a log-install.txt
-echo "SquidProxy    : 8080 (limit to IP SSH)"  | tee -a log-install.txt
-echo "Nginx : 80"  | tee -a log-install.txt
-echo "badvpn   : badvpn-udpgw port 7300"  | tee -a log-install.txt
-echo "Webmin   : http://$MYIP:10000/"  | tee -a log-install.txt
-echo "vnstat   : http://$MYIP/vnstat/"  | tee -a log-install.txt
-echo "MRTG     : http://$MYIP/mrtg/"  | tee -a log-install.txt
-echo "Timezone : Asia/Jakarta"  | tee -a log-install.txt
-echo "Fail2Ban : [on]"  | tee -a log-install.txt
-echo "IPv6     : [off]"  | tee -a log-install.txt
-echo "Root Login on Port 22 : [disabled]"  | tee -a log-install.txt
+echo "SquidProxy : 8080 (limit to IP SSH)"  | tee -a log-install.txt
+echo "Nginx Port : 80"  | tee -a log-install.txt
+echo "badvpn     : badvpn-udpgw port 7300"  | tee -a log-install.txt
+echo "Webmin     : http://$MYIP:10000/"  | tee -a log-install.txt
+echo "vnstat     : http://$MYIP/vnstat/"  | tee -a log-install.txt
+echo "MRTG       : http://$MYIP/mrtg/"  | tee -a log-install.txt
+echo "Timezone   : Asia/Jakarta"  | tee -a log-install.txt
+echo "Fail2Ban   : [on]"  | tee -a log-install.txt
+echo "IPv6       : [off]"  | tee -a log-install.txt
+echo "Root Login on Port 22 : [on]"  | tee -a log-install.txt
+echo "DDOS Flate : [on]" | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "Tools"  | tee -a log-install.txt
 echo "-----"  | tee -a log-install.txt
@@ -369,17 +358,17 @@ echo "" | tee -a log-install.txt
 echo "Script Command"  | tee -a log-install.txt
 echo "--------------"  | tee -a log-install.txt
 echo "speedtest --share : untuk cek speed vps"  | tee -a log-install.txt
-echo "mem : untuk melihat pemakaian ram"  | tee -a log-install.txt
-echo "checkvirus : untuk scan virus / malware"  | tee -a log-install.txt
-echo "bench : untuk melihat performa vps" | tee -a log-install.txt
-echo "usernew : untuk membuat akun baru"  | tee -a log-install.txt
-echo "userlist : untuk melihat daftar akun beserta masa aktifnya"  | tee -a log-install.txt
+echo "mem               : untuk melihat pemakaian ram"  | tee -a log-install.txt
+echo "checkvirus        : untuk scan virus / malware"  | tee -a log-install.txt
+echo "bench             : untuk melihat performa vps" | tee -a log-install.txt
+echo "usernew           : untuk membuat akun baru"  | tee -a log-install.txt
+echo "userlist          : untuk melihat daftar akun beserta masa aktifnya"  | tee -a log-install.txt
 echo "userlimit <limit> : untuk kill akun yang login lebih dari <limit>. Cth: userlimit 1"  | tee -a log-install.txt
-echo "userlogin  : untuk melihat user yang sedang login"  | tee -a log-install.txt
-echo "userdelete  : untuk menghapus user"  | tee -a log-install.txt
-echo "usertrial : untuk membuat akun trial selama 1 hari"  | tee -a log-install.txt
-echo "renew : untuk memperpanjang masa aktif akun"  | tee -a log-install.txt
-echo "menu : untuk melihat daftar command"  | tee -a log-install.txt
+echo "userlogin         : untuk melihat user yang sedang login"  | tee -a log-install.txt
+echo "userdelete        : untuk menghapus user"  | tee -a log-install.txt
+echo "usertrial         : untuk membuat akun trial selama 1 hari"  | tee -a log-install.txt
+echo "renew             : untuk memperpanjang masa aktif akun"  | tee -a log-install.txt
+echo "menu              : untuk melihat daftar command"  | tee -a log-install.txt
 echo "--------------"  | tee -a log-install.txt
-echo "CATATAN: Karena alasan keamanan untuk login ke user root silahkan gunakan port 443" | tee -a log-install.txt
+echo "CATATAN: Akses root melalui OpenSSH telah dinonaktifkan, silahkan untuk menggunakan Dropbear" | tee -a log-install.txt
 rm -f /root/centos-kvm.sh
