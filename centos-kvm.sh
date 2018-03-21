@@ -57,10 +57,10 @@ rpm -Uvh epel-release-6-8.noarch.rpm
 rpm -Uvh remi-release-6.rpm
 
 if [ "$OS" == "x86_64" ]; then
-  wget https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/app/rpmforge.rpm
+  wget https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/app/rpmforge.rpm
   rpm -Uvh rpmforge.rpm
 else
-  wget https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/app/rpmforge.rpm
+  wget https://raw.github.com/khairilg/script-jualan-ssh-vpn/master/app/rpmforge.rpm
   rpm -Uvh rpmforge.rpm
 fi
 
@@ -96,7 +96,7 @@ chkconfig nginx on
 chkconfig php-fpm on
 
 # install essential package
-yum -y install whois rrdtool screen iftop htop nmap bc nethogs openvpn vnstat ngrep mtr git zsh mrtg unrar rsyslog rkhunter mrtg net-snmp net-snmp-utils expect nano bind-utils
+yum -y install rrdtool screen iftop htop nmap bc nethogs openvpn ngrep mtr git zsh mrtg unrar rsyslog rkhunter mrtg net-snmp net-snmp-utils expect nano bind-utils
 yum -y groupinstall 'Development Tools'
 yum -y install cmake
 yum -y --enablerepo=rpmforge install axel sslh ptunnel unrar
@@ -104,13 +104,6 @@ yum -y --enablerepo=rpmforge install axel sslh ptunnel unrar
 # matiin exim
 service exim stop
 chkconfig exim off
-
-# setting vnstat
-vnstat -u -i eth0
-echo "MAILTO=root" > /etc/cron.d/vnstat
-echo "*/5 * * * * root /usr/sbin/vnstat.cron" >> /etc/cron.d/vnstat
-service vnstat restart
-chkconfig vnstat on
 
 # install screenfetch
 cd
@@ -178,18 +171,6 @@ echo "/bin/false" >> /etc/shells
 echo "PIDFILE=/var/run/dropbear.pid" >> /etc/init.d/dropbear
 service dropbear restart
 chkconfig dropbear on
-
-# install vnstat gui
-cd /home/vps/public_html/
-wget https://raw.githubusercontent.com/khairilg/script-jualan-ssh-vpn/master/app/vnstat_php_frontend-1.5.1.tar.gz
-tar xf vnstat_php_frontend-1.5.1.tar.gz
-rm vnstat_php_frontend-1.5.1.tar.gz
-mv vnstat_php_frontend-1.5.1 vnstat
-cd vnstat
-sed -i "s/\$iface_list = array('eth0', 'sixxs');/\$iface_list = array('eth0');/g" config.php
-sed -i "s/\$language = 'nl';/\$language = 'en';/g" config.php
-sed -i 's/Internal/Internet/g' config.php
-sed -i '/SixXS IPv6/d' config.php
 
 # install fail2ban
 cd
@@ -316,7 +297,6 @@ ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 chown -R nginx:nginx /home/vps/public_html
 service nginx start
 service php-fpm start
-service vnstat restart
 service openvpn restart
 service snmpd restart
 service sshd restart
@@ -337,8 +317,8 @@ echo "SquidProxy : 8080 (limit to IP SSH)"  | tee -a log-install.txt
 echo "Nginx Port : 80"  | tee -a log-install.txt
 echo "badvpn     : badvpn-udpgw port 7300"  | tee -a log-install.txt
 echo "Webmin     : http://$MYIP:10000/"  | tee -a log-install.txt
-echo "vnstat     : http://$MYIP/vnstat/"  | tee -a log-install.txt
-echo "MRTG       : http://$MYIP/mrtg/"  | tee -a log-install.txt
+echo "vnstat     : [inactive]  | tee -a log-install.txt
+echo "MRTG       : http://$MYIP/mrtg"  | tee -a log-install.txt
 echo "Timezone   : Asia/Jakarta"  | tee -a log-install.txt
 echo "Fail2Ban   : [on]"  | tee -a log-install.txt
 echo "IPv6       : [off]"  | tee -a log-install.txt
