@@ -96,7 +96,7 @@ chkconfig nginx on
 chkconfig php-fpm on
 
 # install essential package
-yum -y install rrdtool screen iftop htop nmap bc nethogs openvpn ngrep mtr git zsh mrtg unrar rsyslog rkhunter mrtg net-snmp net-snmp-utils expect nano bind-utils
+yum -y install httpd-devel jwhois rrdtool screen iftop htop nmap bc nethogs openvpn ngrep mtr git zsh mrtg unrar rsyslog rkhunter mrtg net-snmp net-snmp-utils expect nano bind-utils
 yum -y groupinstall 'Development Tools'
 yum -y install cmake
 yum -y --enablerepo=rpmforge install axel sslh ptunnel unrar
@@ -178,36 +178,30 @@ yum -y install fail2ban
 service fail2ban restart
 chkconfig fail2ban on
 
-# Instal DDOS Flate
-if [ -d '/usr/local/ddos' ]; then
-	echo; echo; echo "Please un-install the previous version first"	exit 0else	mkdir /usr/local/ddos
-fi
-clear
-echo; echo 'Installing DOS-Deflate 0.6'; echo
-echo; echo -n 'Downloading source files...'
-wget -q -O /usr/local/ddos/ddos.conf http://www.inetbase.com/scripts/ddos/ddos.conf
-echo -n '.'
-wget -q -O /usr/local/ddos/LICENSE http://www.inetbase.com/scripts/ddos/LICENSE
-echo -n '.'
-wget -q -O /usr/local/ddos/ignore.ip.list http://www.inetbase.com/scripts/ddos/ignore.ip.list
-echo -n '.'
-wget -q -O /usr/local/ddos/ddos.sh http://www.inetbase.com/scripts/ddos/ddos.sh
-chmod 0755 /usr/local/ddos/ddos.sh
-cp -s /usr/local/ddos/ddos.sh /usr/local/sbin/ddos
-echo '...done'
-echo; echo -n 'Creating cron to run script every minute.....(Default setting)'
-/usr/local/ddos/ddos.sh --cron > /dev/null 2>&1
-echo '.....done'
-echo; echo 'Installation has completed.'
-echo 'Config file is at /usr/local/ddos/ddos.conf'
-echo 'Please send in your comments and/or suggestions to zaf@vsnl.com'
-
 # install squid
 yum -y install squid
 wget -O /etc/squid/squid.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/squid-centos.conf"
-sed -i $MYIP2 /etc/squid/squid.conf;
+sed -i $MYIP /etc/squid/squid.conf;
+mkdir -p /opt/script
+cd /opt/script
+wget -O /opt/script/squid_adblock.sh "https://raw.githubusercontent.com/Kahetsema/yura/master/squid_adblock.sh"
+wget -O /opt/script/squid_malware.sh "https://raw.githubusercontent.com/Kahetsema/yura/master/squid_malware.sh"
+chmod +x /opt/script/squid_adblock.sh
+chmod +x /opt/script/squid_malware.sh
 service squid restart
 chkconfig squid on
+
+# konfigurasi squid
+cd
+mkdir /home/squid
+chown -R squid:squid /home/squid
+squid -z
+rpm -ql squid | grep ncsa_auth
+touch /etc/squid/squid_passwd
+chown -R squid:squid /etc/squid/squid_passwd
+chmod 640 /etc/squid/squid_password
+squid -k reconfigure
+service squid restart
 
 # install webmin
 cd
@@ -236,7 +230,7 @@ chmod +x /usr/bin/bmon
 
 # downlaod script
 cd /usr/bin
-wget -0 menu "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/menu-list.sh"
+wget -O menu "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/menu-list.sh"
 wget -O speedtest "https://raw.github.com/sivel/speedtest-cli/master/speedtest.py"
 wget -O bench "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/bench-network.sh"
 wget -O mem "https://raw.github.com/pixelb/ps_mem/master/ps_mem.py"
@@ -248,7 +242,7 @@ wget -O userlimit "https://github.com/kahetsema/script-jualan-ssh-vpn/raw/master
 wget -O renew "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-renew.sh"
 wget -O userlist "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-list.sh" 
 wget -O usertrial "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/user-trial.sh"
-wget -0 restart "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/restart.sh"
+wget -O restart "https://raw.github.com/kahetsema/kahetsema/script-jualan-ssh-vpn/master/restart.sh"
 echo "cat /root/log-install.txt" | tee info
 echo "speedtest --share" | tee speedtest
 wget -O /root/chkrootkit.tar.gz ftp://ftp.pangeia.com.br/pub/seg/pac/chkrootkit.tar.gz
@@ -297,7 +291,6 @@ ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 chown -R nginx:nginx /home/vps/public_html
 service nginx start
 service php-fpm start
-service openvpn restart
 service snmpd restart
 service sshd restart
 service dropbear restart
@@ -310,20 +303,20 @@ chkconfig crond on
 # info
 echo "Layanan yang diaktifkan"  | tee -a log-install.txt
 echo "--------------------------------------"  | tee -a log-install.txt
-echo "OpenVPN    : [off] {TCP 1194 (client config : http://$MYIP/client.ovpn)}"  | tee -a log-install.txt
-echo "Port OpenSSH  : 212, 444"  | tee -a log-install.txt
-echo "Port Dropbear : 143, 3128"  | tee -a log-install.txt
+echo "OpenVPN    : TCP 1194"  | tee -a log-install.txt
+echo "OpenSSH    : 212, 444"  | tee -a log-install.txt
+echo "Dropbear   : 143, 3128"  | tee -a log-install.txt
 echo "SquidProxy : 8080 (limit to IP SSH)"  | tee -a log-install.txt
 echo "Nginx Port : 80"  | tee -a log-install.txt
 echo "badvpn     : badvpn-udpgw port 7300"  | tee -a log-install.txt
-echo "Webmin     : http://$MYIP:10000/"  | tee -a log-install.txt
+echo "Webmin     : http://107.175.60.168:10000/"  | tee -a log-install.txt
 echo "vnstat     : [inactive]  | tee -a log-install.txt
 echo "MRTG       : http://$MYIP/mrtg"  | tee -a log-install.txt
 echo "Timezone   : Asia/Jakarta"  | tee -a log-install.txt
 echo "Fail2Ban   : [on]"  | tee -a log-install.txt
 echo "IPv6       : [off]"  | tee -a log-install.txt
-echo "Root Login on Port 22 : [on]"  | tee -a log-install.txt
-echo "DDOS Flate : [on]" | tee -a log-install.txt
+echo "Root Port 22 : [off]"  | tee -a log-install.txt
+echo "DDOS Deflate : [inactive]" | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "Tools"  | tee -a log-install.txt
 echo "-----"  | tee -a log-install.txt
