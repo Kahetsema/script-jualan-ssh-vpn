@@ -115,15 +115,15 @@ echo "screenfetch" >> .bash_profile
 
 # install webserver
 cd
-wget -O /etc/nginx/nginx.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/nginx.conf"
-sed -i 's/www-data/nginx/g' /etc/nginx/nginx.conf
-mkdir -p /home/vps/public_html
-echo "<pre><b>It works!</b></pre>" > /home/vps/public_html/index.html
-echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
-rm /etc/nginx/conf.d/*
-wget -O /etc/nginx/conf.d/vps.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/vps.conf"
-sed -i 's/apache/nginx/g' /etc/php-fpm.d/www.conf
-chmod -R +rx /home/vps
+#wget -O /etc/nginx/nginx.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/nginx.conf"
+#sed -i 's/www-data/nginx/g' /etc/nginx/nginx.conf
+#mkdir -p /home/vps/public_html
+#echo "<pre><b>It works!</b></pre>" > /home/vps/public_html/index.html
+#echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
+#rm /etc/nginx/conf.d/*
+#wget -O /etc/nginx/conf.d/vps.conf "https://raw.github.com/kahetsema/script-jualan-ssh-vpn/master/conf/vps.conf"
+#sed -i 's/apache/nginx/g' /etc/php-fpm.d/www.conf
+#chmod -R +rx /home/vps
 service php-fpm restart
 service nginx restart
 
@@ -159,8 +159,8 @@ LANG=C /usr/bin/mrtg /etc/mrtg/mrtg.cfg
 
 # setting port ssh
 cd
-sed -i '/Port 22/a Port 212' /etc/ssh/sshd_config
-sed -i 's/#Port 22/Port  444/g' /etc/ssh/sshd_config
+sed -i '/Port 22/a Port 22' /etc/ssh/sshd_config
+sed -i 's/#Port 22/Port  212/g' /etc/ssh/sshd_config
 service sshd restart
 chkconfig sshd on
 
@@ -288,7 +288,7 @@ echo "* * * * * root /bin/sh /usr/bin/cron-dropcheck" > /etc/cron.d/dropcheck
 ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 
 # finalisasi
-chown -R nginx:nginx /home/vps/public_html
+#chown -R nginx:nginx /home/vps/public_html
 service nginx start
 service php-fpm start
 service snmpd restart
@@ -304,7 +304,7 @@ chkconfig crond on
 echo "Layanan yang diaktifkan"  | tee -a log-install.txt
 echo "--------------------------------------"  | tee -a log-install.txt
 echo "OpenVPN    : TCP 1194"  | tee -a log-install.txt
-echo "OpenSSH    : 212, 444"  | tee -a log-install.txt
+echo "OpenSSH    : 22, 212"  | tee -a log-install.txt
 echo "Dropbear   : 143, 3128"  | tee -a log-install.txt
 echo "SquidProxy : 8080 (limit to IP SSH)"  | tee -a log-install.txt
 echo "Nginx Port : 80"  | tee -a log-install.txt
@@ -316,7 +316,6 @@ echo "Timezone   : Asia/Jakarta"  | tee -a log-install.txt
 echo "Fail2Ban   : [on]"  | tee -a log-install.txt
 echo "IPv6       : [off]"  | tee -a log-install.txt
 echo "Root Port 22 : [off]"  | tee -a log-install.txt
-echo "DDOS Deflate : [inactive]" | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "Tools"  | tee -a log-install.txt
 echo "-----"  | tee -a log-install.txt
